@@ -1,4 +1,5 @@
 import requests
+import sys
 
 def get_playlist(access_token, playlist_id, fields=None):
     # Define the base URL for the playlist info request
@@ -26,7 +27,11 @@ def get_playlist(access_token, playlist_id, fields=None):
         return None
     
 if __name__ == '__main__':
-    playlist = get_playlist("", "", "name,images,tracks(items(track(name,album(name,images),artists(name)))")
+    av = sys.argv
+    at = av[1]
+    playlist_id = av[2]
+    playlist = get_playlist(at, playlist_id, "name,images,tracks(items(track(name,album(name,images),artists(name)))")
     print(list(playlist.keys()))
     tracks = playlist['tracks']['items']
+    
     #print([track['name'] for track in playlist['tracks']])
