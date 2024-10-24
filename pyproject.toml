@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=64.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "SoundSage"
+version = "0.1.0"
+authors = [
+    { name="Cole Bisaccia", email="bisaccia_cole@bah.com" }
+]
+dependencies = [
+    "numpy",
+    "Flask",
+    "tensorflow",
+    "keras"
+]
+description = "An AI-powered song suggestor."
+readme = "README.md"
+requires-python = ">= 3.8 , <=3.12"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: Other/Proprietary License",
+    "Development Status :: 2 - Pre-Alpha",
+    "Framework :: Flask",
+]
+
+[project.urls]
+Homepage = "https://github.com/cbisaccia78/SoundSage"
+Issues = "https://github.com/cbisaccia78/SoundSage/issues"

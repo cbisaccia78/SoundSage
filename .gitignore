@@ -1,0 +1,4 @@
+/**/*.pyc
+!/**/.gitkeep
+/dist
+/**/*.egg-info
