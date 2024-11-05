@@ -1,7 +1,6 @@
 import requests
 import sys
 
-import playlists
 
 def get_access_token(client_id, client_secret):
     # Define the URL for the token request

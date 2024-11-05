@@ -1,7 +1,6 @@
 import requests
 import sys
-
-from flask import session
+import os
 
 class PlaylistManager:
     def __init__(self, playlist_id=None):
@@ -33,6 +32,10 @@ class PlaylistManager:
             # Print the error response for debugging
             print(f"Error: {response.status_code}, {response.text}")
             raise RuntimeError("")
+        
+    @property
+    def name(self):
+        return self.playlist['name']
     
     def get_tracks(self):
         return [Track(track['track']) for track in self.playlist['tracks']['items']]
@@ -59,4 +62,5 @@ if __name__ == '__main__':
     pm = PlaylistManager()
     pm.load_playlist(playlist_id)
     print(list(pm.playlist.keys()))
-    print(pm.get_tracks()[0])
+    print(pm.get_tracks()[0].name)
+    print(pm.name)
