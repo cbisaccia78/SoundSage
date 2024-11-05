@@ -2,3 +2,4 @@
 !/**/.gitkeep
 /dist
 /**/*.egg-info
+build

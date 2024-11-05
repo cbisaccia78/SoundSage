@@ -9,7 +9,7 @@ class PlaylistManager:
         if playlist_id is not None:
             self.load_playlist(playlist_id)
 
-    def load_playlist(self,playlist_id, fields=None):
+    def load_playlist(self,playlist_id, fields="name,images,tracks(items(track(name,album(name,images),artists(name)))"):
         # Define the base URL for the playlist info request
         url = f"https://api.spotify.com/v1/playlists/{playlist_id}"
         
@@ -19,7 +19,7 @@ class PlaylistManager:
         
         # Set the headers, including the Authorization Bearer token
         headers = {
-            "Authorization": f"Bearer {session.get('access_token')}"
+            "Authorization": f"Bearer {os.environ['access_token']}"
         }
         
         # Make the GET request to retrieve playlist information
@@ -34,6 +34,17 @@ class PlaylistManager:
             print(f"Error: {response.status_code}, {response.text}")
             raise RuntimeError("")
     
+    def get_tracks(self):
+        return [Track(track['track']) for track in self.playlist['tracks']['items']]
+    
+class Track:
+    def __init__(self, track_dict):
+        self.name = track_dict['name']
+        self.artists = [artist['name'] for artist in track_dict['artists']]
+        self.album_name = track_dict['album']['name']
+        self.album_images = track_dict['album']['images']
+
+    
 if __name__ == '__main__':
     import os
     import authentication
@@ -41,12 +52,11 @@ if __name__ == '__main__':
     id = os.environ['SPOTIFY_CLIENT_ID']
     secret = os.environ['SPOTIFY_CLIENT_SECRET']
 
-    session['access_token'] = authentication.get_access_token(id, secret)
+    os.environ['access_token'] = authentication.get_access_token(id, secret)
 
     av = sys.argv
-    at = av[1]
-    playlist_id = av[2]
+    playlist_id = av[1]
     pm = PlaylistManager()
-    pm.load_playlist(playlist_id, "name,images,tracks(items(track(name,album(name,images),artists(name)))")
+    pm.load_playlist(playlist_id)
     print(list(pm.playlist.keys()))
-    tracks = pm.playlist['tracks']['items']
+    print(pm.get_tracks()[0])

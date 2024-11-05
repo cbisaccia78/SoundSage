@@ -1,4 +1,4 @@
-from flask import render_template, request, Blueprint, Response, session
+from flask import render_template, request, Blueprint, Response, redirect, url_for
 
 
 playlist = None
@@ -17,7 +17,7 @@ def home():
     global playlist
     global index
 
-    return render_template('home.jinja2', playlist_name=playlist['name'], song=playlist['songs'][index], shuffle=shuffle)
+    return render_template('home.jinja2', playlist_name=playlist['name'], song= None if not playlist else playlist['songs'][index], shuffle=shuffle)
 
 @bp.route('/previous', methods=["GET"])
 def previous():
@@ -26,7 +26,7 @@ def previous():
     global playlist
     global index
 
-    return render_template('home.jinja2', playlist_name=playlist['name'], song=playlist['songs'][index], shuffle=shuffle)
+    return redirect(url_for('static'))
 
 @bp.route('/play', methods=["GET"])
 def play():
