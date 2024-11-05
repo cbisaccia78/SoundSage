@@ -18,12 +18,18 @@ bp = Blueprint('home', __name__, url_prefix='/')
 
 @bp.route('/', methods=["GET", "POST"])
 def home():
-    return render_template('home.jinja2', playlist_name=None if not playlist_manager else playlist_manager.name, song=None if not tracks else tracks[index], shuffle=shuffle)
+    return render_template(
+        'home.jinja2',
+        playlist_name=None if not playlist_manager else playlist_manager.name,
+        track=None if not tracks else tracks[index],
+        shuffle=shuffle,
+        )
 
 @bp.route('/previous', methods=["GET"])
 def previous():
 
     global index
+
     index = (index - 1) % num_tracks
 
     return redirect('/')
@@ -51,6 +57,17 @@ def shuffle():
     if shuffle:
         random.shuffle(tracks)
 
+    return redirect('/')
+
+@bp.route('/submit_ratings', methods=["POST"])
+def submit_ratings():
+    global tracks
+
+    for key, value in request.form.items():
+        if key.startswith("rating-"):
+            tracks[index].rating = int(value)  # Store the rating as an integer
+
+    
     return redirect('/')
 
 @bp.route('/import_playlist', methods=['POST'])

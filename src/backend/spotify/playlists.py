@@ -46,6 +46,7 @@ class Track:
         self.artists = [artist['name'] for artist in track_dict['artists']]
         self.album_name = track_dict['album']['name']
         self.album_images = track_dict['album']['images']
+        self.rating = None
 
     
 if __name__ == '__main__':
