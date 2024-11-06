@@ -96,6 +96,11 @@ def import_playlist():
     
     return redirect('/')
 
+@bp.route('/create_model', methods=["GET"])
+def create_model():
+    
+    return redirect('/')
+
 @bp.route('bing/<int:id>', methods=["GET"])
 def bing(id):
 

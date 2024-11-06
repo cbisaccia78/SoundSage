@@ -10,7 +10,7 @@
                 <h1 class="text-center">{{ playlist_name }}</h1>
                 <!-- Iterate through the playlist tracks -->
                 <div class="col-md-6 mb-4 d-flex justify-content-center">
-                    <div class="card shadow" style="width: 50%; height: 30vh;">
+                    <div class="card shadow" style="width: 50%; max-height: 70vh;">
                         <div class="card-body d-flex flex-column justify-content-between">
                             <h5 class="card-title text-center">{{ track.name }}</h5>
                             <h5 class="card-title text-center">{{ track.artists }}</h5>
@@ -41,10 +41,18 @@
                                         <input type="radio" name="rating-4" value="4" {% if track.rating == 4 %}checked{% endif %}> 4 &nbsp;
                                         <input type="radio" name="rating-5" value="5" {% if track.rating == 5 %}checked{% endif %}> 5
                                     </div>
-                                    <button type="submit" class="btn btn-primary mt-3">Submit Rating</button>
                                 </div>
-                                
+                                <!-- Centered Submit Rating button -->
+                                <div class="d-flex justify-content-center mt-3">
+                                    <button type="submit" class="btn btn-primary">Submit Rating</button>
+                                </div>
+
+                                <!-- Centered Create Model button below -->
+                                <div class="d-flex justify-content-center mt-3">
+                                    <a href="/create_model" class="btn btn-primary">Create Model</a>
+                                </div>
                             </form>
+                            
                         </div>
                     </div>
                 </div>
