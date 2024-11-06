@@ -65,13 +65,13 @@
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Import a Playlist</h5>
-                            <p class="card-text">Paste a Spotify playlist link or upload a playlist file to get started.</p>
+                            <p class="card-text">Paste a Spotify playlist id to get started.</p>
                             
                             <!-- Form for importing playlist -->
                             <form method="POST" action="/import_playlist" enctype="multipart/form-data">
                                 <!-- Input for Spotify link -->
                                 <div class="mb-3">
-                                    <label for="playlistId" class="form-label">Spotify Playlist Id</label>
+                                    <label for="playlistId" class="form-label">Spotify Playlist id</label>
                                     <input type="text" class="form-control" id="playlistId" name="playlistId" placeholder="playlist_id" required>
                                 </div>
 
