@@ -66,7 +66,14 @@ class Track:
         # Check if the request was successful
         if response.status_code == 200:
             # Parse the JSON response and return playlist info
-            print(response.json().keys())
+            resp = response.json()
+
+            del resp['track_href']
+            del resp['uri']
+            del resp['type']
+            del resp['analysis_url']
+
+            self.audio_features = resp
         else:
             # Print the error response for debugging
             print(f"Error: {response.status_code}, {response.text}")
@@ -87,7 +94,22 @@ class Track:
         # Check if the request was successful
         if response.status_code == 200:
             # Parse the JSON response and return playlist info
-            print(response.json().keys())
+            resp = response.json()
+
+            del resp['meta']
+
+            track = resp['track']
+            del track['sample_md5']
+            del track['codestring']
+            del track['code_version']
+            del track['echoprintstring']
+            del track['echoprint_version']
+            del track['synchstring']
+            del track['synch_version']
+            del track['rhythmstring']
+            del track['rhythm_version']
+
+            self.audio_analysis = resp
         else:
             # Print the error response for debugging
             print(f"Error: {response.status_code}, {response.text}")
@@ -111,6 +133,8 @@ if __name__ == '__main__':
     track = pm.get_tracks()[0]
     print(track.name)
     print(track.id)
-    track.load_audio_analysis()
+    taa = track.load_audio_analysis()
+    print(taa['track'])
+    print(taa[''])
     track.load_audio_features()
     

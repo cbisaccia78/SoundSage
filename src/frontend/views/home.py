@@ -60,15 +60,17 @@ def shuffle():
 
     return redirect('/')
 
-@bp.route('/submit_ratings', methods=["POST"])
-def submit_ratings():
+@bp.route('/submit_rating', methods=["POST"])
+def submit_rating():
     global tracks
 
     for key, value in request.form.items():
         if key.startswith("rating-"):
-            tracks[index].rating = int(value) - 1  # Store the rating as an integer
+            track = tracks[index]
+            track.rating = int(value) - 1  # Store the rating as an integer
+            track.load_audio_analysis()
+            track.load_audio_features()
 
-    
     return redirect('/')
 
 @bp.route('/import_playlist', methods=['POST'])
