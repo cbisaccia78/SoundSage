@@ -3,6 +3,7 @@ import random
 from flask import render_template, request, Blueprint, Response, redirect
 
 from backend.spotify.playlists import PlaylistManager
+from backend.models.rating_predictor import create_rating_model
 
 
 playlist_manager = None
@@ -98,7 +99,9 @@ def import_playlist():
 
 @bp.route('/create_model', methods=["GET"])
 def create_model():
-    
+    rated_tracks = [track for track in tracks if track.rating is not None]
+    model = create_rating_model(rated_tracks)
+
     return redirect('/')
 
 @bp.route('bing/<int:id>', methods=["GET"])
