@@ -66,7 +66,7 @@ def submit_ratings():
 
     for key, value in request.form.items():
         if key.startswith("rating-"):
-            tracks[index].rating = int(value)  # Store the rating as an integer
+            tracks[index].rating = int(value) - 1  # Store the rating as an integer
 
     
     return redirect('/')

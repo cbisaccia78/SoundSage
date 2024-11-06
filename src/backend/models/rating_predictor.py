@@ -4,6 +4,7 @@ import numpy as np
 
 from keras.layers import Dense
 from ml_utils.transformations import string_to_1hot_sequence, split_vector
+from ml_utils.validation import strat_kfold
 
 
 def create_rating_model(tracks):
@@ -51,7 +52,7 @@ def create_rating_model(tracks):
 
     rating = Dense(5, activation='softmax')(features)
 
-    model = keras.Model(inputs=[track_name_layer, track_album_name_layer, track_artists_layer], outputs=[rating])
+    model = keras.Model(inputs=[track_name_layer, track_artists_layer, track_album_name_layer], outputs=[rating])
     model.compile(optimizer='adam', loss=keras.losses.SparseCategoricalCrossentropy(), metrics=[keras.metrics.SparseCategoricalAccuracy()])
     
     # Fit model
@@ -63,7 +64,7 @@ def create_rating_model(tracks):
         validation_data=([track_names_valid, track_artists_valid, track_album_names_valid], [track_ratings_valid])
     )
     
-    test_loss, test_accuracy = model.predict(
+    test_loss, test_accuracy = model.evaluate(
         x=[track_names_test, track_artists_test, track_album_names_test],
         y=[track_ratings_test],
     )
