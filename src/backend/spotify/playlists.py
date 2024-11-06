@@ -72,6 +72,7 @@ class Track:
             del resp['uri']
             del resp['type']
             del resp['analysis_url']
+            del resp['id']
 
             self.audio_features = resp
         else:
@@ -120,6 +121,8 @@ if __name__ == '__main__':
     import os
     import authentication
 
+    from ml_utils.transformations import flatten_dict_values
+
     id = os.environ['SPOTIFY_CLIENT_ID']
     secret = os.environ['SPOTIFY_CLIENT_SECRET']
 
@@ -133,8 +136,8 @@ if __name__ == '__main__':
     track = pm.get_tracks()[0]
     print(track.name)
     print(track.id)
-    taa = track.load_audio_analysis()
-    print(taa['track'])
-    print(taa[''])
+    track.load_audio_analysis()
     track.load_audio_features()
+    print(flatten_dict_values(track.audio_analysis))
+    print(flatten_dict_values(track.audio_features))
     
