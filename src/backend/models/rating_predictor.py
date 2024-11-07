@@ -135,8 +135,8 @@ def create_rating_model(tracks):
     track_name_layer = keras.Input(shape=track_names[0].shape)
     track_artists_layer = keras.Input(shape=track_artists[0].shape)
     track_album_name_layer = keras.Input(shape=track_album_names[0].shape)
-    track_audio_features_layer = keras.Input(shape=track_names[0].shape)
-    track_audio_analysis_layer = keras.Input(shape=track_names[0].shape)
+    track_audio_features_layer = keras.Input(shape=track_audio_features[0].shape)
+    track_audio_analysis_layer = keras.Input(shape=track_audio_analysis[0].shape)
 
     features = keras.layers.Concatenate()([
         track_name_layer,
