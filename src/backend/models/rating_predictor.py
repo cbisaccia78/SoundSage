@@ -5,6 +5,7 @@ import numpy as np
 from keras.layers import Dense
 from ml_utils.transformations import string_to_1hot_sequence, split_vector, flatten_dict_values, normalize
 from ml_utils.validation import strat_kfold
+import pdb
 
 def create_rating_model(tracks):
     ## Create dataset and labels
@@ -116,19 +117,31 @@ def create_rating_model(tracks):
     track_audio_analysis_train, track_audio_analysis_valid, track_audio_analysis_test = split_vector(track_audio_analysis, 0.6, 0.8)
 
     track_ratings_train, track_ratings_valid, track_ratings_test = split_vector(track_ratings, 0.6, 0.8)
-
-    # normalize features/analysis
+    pdb.set_trace()
+    ## normalize features/analysis
     feature_mean = track_audio_features_train.mean(axis=0)
     feature_std = track_audio_features_train.std(axis=0)
     normalize(track_audio_features_train, feature_mean, feature_std)
     normalize(track_audio_features_valid, feature_mean, feature_std)
     normalize(track_audio_features_test, feature_mean, feature_std)
 
+    ## drop any feature columns with 0 standard deviation
+    nonzero_std_idx = np.where(feature_std != 0)[0]
+    track_audio_features_train = track_audio_features_train[:, nonzero_std_idx]
+    track_audio_features_valid = track_audio_features_valid[:, nonzero_std_idx]
+    track_audio_features_test = track_audio_features_test[:, nonzero_std_idx]
+
     analysis_mean = track_audio_analysis_train.mean(axis=0)
     analysis_std = track_audio_analysis_train.std(axis=0)
     normalize(track_audio_analysis_train, analysis_mean, analysis_std)
     normalize(track_audio_analysis_valid, analysis_mean, analysis_std)
     normalize(track_audio_analysis_test, analysis_mean, analysis_std)
+
+    ## drop any analysis columns with 0 standard deviation
+    nonzero_std_idx = np.where(analysis_std != 0)[0]
+    track_audio_analysis_train = track_audio_analysis_train[:, nonzero_std_idx]
+    track_audio_analysis_valid = track_audio_analysis_valid[:, nonzero_std_idx]
+    track_audio_analysis_test = track_audio_analysis_test[:, nonzero_std_idx]
 
     ## Create model
 
