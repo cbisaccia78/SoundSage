@@ -3,10 +3,10 @@ import tensorflow as tf
 import numpy as np
 
 from keras.layers import Dense
-from ml_utils.transformations import string_to_1hot_sequence, split_vector, flatten_dict_values
+from ml_utils.transformations import string_to_1hot_sequence, split_vector, flatten_dict_values, normalize
 from ml_utils.validation import strat_kfold
 
-
+import pdb
 def create_rating_model(tracks):
     ## Create dataset and labels
     track_names = []
@@ -29,17 +29,85 @@ def create_rating_model(tracks):
     track_names = np.array(track_names)
     track_artists = np.array(track_artists)
     track_album_names = np.array(track_album_names)
+    track_ratings = np.array(track_ratings)
 
     # one-hot all the string data based on frequency
     track_names = string_to_1hot_sequence(track_names)
     track_artists = string_to_1hot_sequence(track_artists)
     track_album_names = string_to_1hot_sequence(track_album_names)
-
+    pdb.set_trace()
     # bars, beats, sections, segments, tatums all need to be padded
-    track_audio_features = [flatten_dict_values(audio_features) for audio_features in track_audio_features]
-    track_audio_analysis = [flatten_dict_values(audio_analysis) for audio_analysis in track_audio_analysis]
+    # determine the maximum length of each, respectively. 
+    max_bars = max_beats = max_sections = max_segments = max_tatums = 0
+    for analysis in track_audio_analysis:
+        bar_len = len(analysis['bars'])
+        beat_len = len(analysis['beats'])
+        section_len = len(analysis['sections'])
+        segment_len = len(analysis['segments'])
+        tatum_len = len(analysis['tatums'])
 
-    track_ratings = np.array(track_ratings)
+        if bar_len > max_bars:
+            max_bars = bar_len
+        
+        if beat_len > max_beats:
+            max_beats = beat_len
+        
+        if section_len > max_sections:
+            max_sections = section_len
+        
+        if segment_len > max_segments:
+            max_segments = segment_len
+        
+        if tatum_len > max_tatums:
+            max_tatums = tatum_len
+
+        # store lengths for subsequent calculation
+        analysis['bar_len'] = bar_len
+        analysis['beat_len'] = beat_len
+        analysis['section_len'] = section_len
+        analysis['segments_len'] = segment_len
+        analysis['tatum_len'] = tatum_len
+
+    # pad analysis with dummies to ensure max length, and also flatten the dict structure for future processing
+    beat_dummy = bar_dummy = tatum_dummy = {'start': 0.0, 'duration': 0.0, 'confidence': 0.0}
+    section_dummy = {"start": 0.0,"duration": 0.0,"confidence": 0,"loudness": 0.0,"tempo": 0.0,"tempo_confidence":0.0,"key": 0.0,"key_confidence": 0.0,"mode": -1,"mode_confidence": 0.0,"time_signature": 0,"time_signature_confidence": 0}
+    segment_dummy = {"start": 0.0,"duration": 0.0,"confidence": 0.0,"loudness_start": 0.0,"loudness_max": 0.0,"loudness_max_time": 0.0,"loudness_end": 0,"pitches": [0.0, 0.0, 0.0,0.0, 0.0, 0.0,0.0, 0.0, 0.0,0.0, 0.0, 0.0],"timbre": [0.0, 0.0, 0.0,0.0, 0.0, 0.0,0.0, 0.0, 0.0,0.0, 0.0, 0.0]}
+    flattened_analysis = []
+    for analysis in track_audio_analysis:
+        bars = analysis['bars']
+        bar_len = analysis['bar_len']
+        bars.extend(bar_dummy for _ in range(max_bars - bar_len))
+
+        beats = analysis['beats']
+        beat_len = analysis['beat_len']
+        beats.extend([beat_dummy for _ in range(max_beats - beat_len)])
+
+        sections = analysis['sections']
+        section_len = analysis['section_len']
+        sections.extend([section_dummy for _ in range(max_sections - section_len)])
+
+        segments = analysis['sections']
+        section_len = analysis['section_len']
+        segments.extend([segment_dummy for _ in range(max_segments - segment_len)])
+
+        tatums = analysis['tatums']
+        tatum_len = analysis['tatum_len']
+        tatums.extend([tatum_dummy for _ in range(max_tatums - tatum_len)])
+        
+
+        # delete un-needed field
+        del analysis['bar_len']
+        del analysis['beat_len']
+        del analysis['section_len']
+        del analysis['segments_len']
+        del analysis['tatum_len']
+
+        flattened_analysis.append(flatten_dict_values(analysis))
+
+    track_audio_analysis = np.array(flattened_analysis)
+
+    # features need to be flattened as well
+    track_audio_features = np.array([flatten_dict_values(audio_features) for audio_features in track_audio_features])
 
     ## partition data/labels into train, validation, test
 
@@ -50,6 +118,19 @@ def create_rating_model(tracks):
     track_audio_analysis_train, track_audio_analysis_valid, track_audio_analysis_test = split_vector(track_audio_analysis, 0.6, 0.8)
 
     track_ratings_train, track_ratings_valid, track_ratings_test = split_vector(track_ratings, 0.6, 0.8)
+
+    # normalize features/analysis
+    feature_mean = track_audio_features_train.mean(axis=0)
+    feature_std = track_audio_features_train.std(axis=0)
+    normalize(track_audio_features_train, feature_mean, feature_std)
+    normalize(track_audio_features_valid, feature_mean, feature_std)
+    normalize(track_audio_features_test, feature_mean, feature_std)
+
+    analysis_mean = track_audio_analysis_train.mean(axis=0)
+    analysis_std = track_audio_analysis_train.std(axis=0)
+    normalize(track_audio_analysis_train, analysis_mean, analysis_std)
+    normalize(track_audio_analysis_valid, analysis_mean, analysis_std)
+    normalize(track_audio_analysis_test, analysis_mean, analysis_std)
 
     ## Create model
 
