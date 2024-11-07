@@ -6,7 +6,6 @@ from keras.layers import Dense
 from ml_utils.transformations import string_to_1hot_sequence, split_vector, flatten_dict_values, normalize
 from ml_utils.validation import strat_kfold
 
-import pdb
 def create_rating_model(tracks):
     ## Create dataset and labels
     track_names = []
@@ -35,7 +34,6 @@ def create_rating_model(tracks):
     track_names = string_to_1hot_sequence(track_names)
     track_artists = string_to_1hot_sequence(track_artists)
     track_album_names = string_to_1hot_sequence(track_album_names)
-    pdb.set_trace()
     # bars, beats, sections, segments, tatums all need to be padded
     # determine the maximum length of each, respectively. 
     max_bars = max_beats = max_sections = max_segments = max_tatums = 0
@@ -65,7 +63,7 @@ def create_rating_model(tracks):
         analysis['bar_len'] = bar_len
         analysis['beat_len'] = beat_len
         analysis['section_len'] = section_len
-        analysis['segments_len'] = segment_len
+        analysis['segment_len'] = segment_len
         analysis['tatum_len'] = tatum_len
 
     # pad analysis with dummies to ensure max length, and also flatten the dict structure for future processing
@@ -86,8 +84,8 @@ def create_rating_model(tracks):
         section_len = analysis['section_len']
         sections.extend([section_dummy for _ in range(max_sections - section_len)])
 
-        segments = analysis['sections']
-        section_len = analysis['section_len']
+        segments = analysis['segments']
+        segment_len = analysis['segment_len']
         segments.extend([segment_dummy for _ in range(max_segments - segment_len)])
 
         tatums = analysis['tatums']
@@ -99,7 +97,7 @@ def create_rating_model(tracks):
         del analysis['bar_len']
         del analysis['beat_len']
         del analysis['section_len']
-        del analysis['segments_len']
+        del analysis['segment_len']
         del analysis['tatum_len']
 
         flattened_analysis.append(flatten_dict_values(analysis))
